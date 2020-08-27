@@ -18,8 +18,8 @@ function createWindow(url) {
   win.webContents.loadURL(url).then(() => {
     win.maximize()
     win.show()
-  }).catch(() => {
-    console.error("could not open window")
+  }).catch((err) => {
+    console.error("could not open window", err)
     app.quit()
   })
 
@@ -32,49 +32,50 @@ if (!gotTheLock) {
   app.quit()
 } else {
   app.on('second-instance', (event, argv, workingDirectory) => {
+    if (app.isPackaged) {
+      argv.unshift(null)
+    }
     if (!argv || argv.length < 4) {
+      console.log("wrong number of args", argv)
       return
     }
-
 
     let url = argv[3].split(':', 2);
     url = `https://${url[1]}`;
 
     if (win) {
+      console.log("window found")
       win.webContents.loadURL(url)
       if (win.isMinimized()) win.restore()
       win.focus()
+    } else {
+      createWindow(url)
     }
 
-    createWindow(url)
   })
 
-  if (!process.argv || process.argv.length < 3) {
-    console.error('no info browser')
-    app.quit()
+  if (app.isPackaged) {
+    process.argv.unshift(null)
   }
 
-
-  let url = process.argv[2].split(':', 2);
-  url = `https://${url[1]}`;
-
-  // This method will be called when Electron has finished
-  // initialization and is ready to create browser windows.
-  // Some APIs can only be used after this event occurs.
-  app.whenReady().then(() => createWindow(url)).catch((err) => {
-    console.error("app never ready", err)
+  if (!process.argv || process.argv.length < 3) {
+    console.error('no info browser', argv)
     app.quit()
-  })
-
-  // Quit when all windows are closed, except on macOS. There, it's common
-  // for applications and their menu bar to stay active until the user quits
-  // explicitly with Cmd + Q.
-  app.on('window-all-closed', () => {
-    console.log("closing all")
-    app.quit()
-  })
+  } else {
 
 
+    let url = process.argv[2].split(':', 2);
+    url = `https://${url[1]}`;
+    app.whenReady().then(() => createWindow(url)).catch((err) => {
+      console.error("app never ready", err)
+      app.quit()
+    })
+    app.on('window-all-closed', () => {
+      console.log("closing all")
+      app.quit()
+    })
+
+  }
 }
 
 // In this file you can include the rest of your app's specific main process
