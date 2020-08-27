@@ -1,14 +1,32 @@
 {
-  "name": "electronapp",
+  "name": "ipcom-browser",
   "version": "1.0.0",
-  "description": "",
+  "description": "IPCOM Browser",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "dist": "electron-builder -w nsis",
+    "distweb": "electron-builder -w nsis-web"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "electron": "^10.0.0"
+    "electron": "^10.0.0",
+    "electron-builder": "^22.8.0"
+  },
+  "build": {
+    "nsis": {
+      "oneClick": false,
+      "runAfterFinish": false,
+      "createDesktopShortcut": false,
+      "createStartMenuShortcut": false,
+      "include": "build/installer.nsh"
+    },
+    "protocols": {
+      "name": "ipcom-protocol",
+      "schemes": [
+        "ipcom"
+      ]
+    }
   }
 }

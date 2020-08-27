@@ -1,19 +1,22 @@
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow, Menu } = require('electron')
 
 let win;
 
+
 function createWindow(url) {
+
+  Menu.setApplicationMenu(null);
   // Create the browser window.
   win = new BrowserWindow({
     show: false,
+    title: "IPCOM Browser",
     webPreferences: {
-      nodeIntegration: true
+      sandbox: true
     }
   })
-  win.webContents.openDevTools()
-  win.loadFile("./index.html").then(() => {
-    win.webContents.send("changeWeb", url)
-  })
+
+
+  win.webContents.loadURL(url)
   win.maximize()
   win.show()
 }
@@ -24,15 +27,26 @@ if (!gotTheLock) {
   app.quit()
 } else {
   app.on('second-instance', (event, argv, workingDirectory) => {
-    // Someone tried to run a second instance, we should focus our window.
+    if (!argv || argv.length < 4) {
+      return
+    }
+
     if (win) {
-      win.webContents.send("changeWeb", argv[3])
+      let url = argv[3].split(':', 2);
+      url = `https://${url[1]}`;
+      win.webContents.loadURL(url)
       if (win.isMinimized()) win.restore()
       win.focus()
     }
   })
 
-  const url = process.argv[2]
+  if (!process.argv || process.argv.length < 3) {
+    return
+  }
+
+
+  let url = process.argv[2].split(':', 2);
+  url = `https://${url[1]}`;
 
   // This method will be called when Electron has finished
   // initialization and is ready to create browser windows.
