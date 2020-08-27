@@ -20,7 +20,8 @@
       "runAfterFinish": false,
       "createDesktopShortcut": false,
       "createStartMenuShortcut": false,
-      "include": "build/installer.nsh"
+      "include": "build/installer.nsh",
+      "artifactName": "${productName}-setup.${ext}"
     },
     "protocols": {
       "name": "ipcom-protocol",

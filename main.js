@@ -20,7 +20,7 @@ function createWindow(url) {
     win.show()
   }).catch((err) => {
     console.error("could not open window", err)
-    app.quit()
+    app.exit(0)
   })
 
 }
@@ -60,7 +60,7 @@ if (!gotTheLock) {
 
   if (!process.argv || process.argv.length < 3) {
     console.error('no info browser', argv)
-    app.quit()
+    app.exit(0)
   } else {
 
 
@@ -68,12 +68,13 @@ if (!gotTheLock) {
     url = `https://${url[1]}`;
     app.whenReady().then(() => createWindow(url)).catch((err) => {
       console.error("app never ready", err)
-      app.quit()
+      app.exit(0)
     })
-    app.on('window-all-closed', () => {
+    app.once('window-all-closed', () => {
       console.log("closing all")
-      app.quit()
+      app.exit(0)
     })
+
 
   }
 }
