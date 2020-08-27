@@ -18,7 +18,7 @@ jobs:
       - name: NPM Install # This would actually build your project, using zip for an example artifact
         run: npm install
       - name: NPM Build
-        run: npm run dist --publish=never
+        run: npm run dist
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
