@@ -4,15 +4,15 @@
   "description": "IPCOM Browser",
   "main": "main.js",
   "scripts": {
-    "start": "electron .",
+    "start": "electron . aaaaa",
     "dist": "electron-builder -w nsis --publish never",
     "distweb": "electron-builder -w nsis-web"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "electron": "^10.0.0",
-    "electron-builder": "^22.8.0"
+    "electron": "^11.2.3",
+    "electron-builder": "^22.9.1"
   },
   "build": {
     "nsis": {
@@ -29,5 +29,6 @@
         "ipcom"
       ]
     }
-  }
+  },
+  "dependencies": {}
 }

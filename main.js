@@ -25,9 +25,9 @@ function createWindow(url) {
 
 }
 
-const gotTheLock = app.requestSingleInstanceLock()
+const singleInstanceLock = app.requestSingleInstanceLock()
 
-if (!gotTheLock) {
+if (!singleInstanceLock) {
   console.log("app already running")
   app.quit()
 } else {
@@ -40,8 +40,8 @@ if (!gotTheLock) {
       return
     }
 
-    let url = argv[3].split(':', 2);
-    url = `https://${url[1]}`;
+    let urlParts = argv[3].split(':', 2);
+    const url = `https://${urlParts[1]}`;
 
     if (win) {
       console.log("window found")
@@ -54,18 +54,19 @@ if (!gotTheLock) {
 
   })
 
+
   if (app.isPackaged) {
     process.argv.unshift(null)
   }
 
   if (!process.argv || process.argv.length < 3) {
-    console.error('no info browser', argv)
+    console.error('no info browser', process.argv)
     app.exit(0)
   } else {
 
 
-    let url = process.argv[2].split(':', 2);
-    url = `https://${url[1]}`;
+    let urlParts = process.argv[2].split(':', 2);
+    const url = `https://${urlParts[1]}`;
     app.whenReady().then(() => createWindow(url)).catch((err) => {
       console.error("app never ready", err)
       app.exit(0)
@@ -78,6 +79,3 @@ if (!gotTheLock) {
 
   }
 }
-
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.
