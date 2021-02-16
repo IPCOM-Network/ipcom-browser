@@ -1,33 +1,44 @@
 const { app, BrowserWindow, Menu } = require('electron')
+const { program } = require('commander');
+
+
 
 let win;
 
 
-function createWindow(url) {
+async function createWindow(url, debug, clear) {
   Menu.setApplicationMenu(null);
   // Create the browser window.
   win = new BrowserWindow({
     show: false,
     title: "IPCOM Browser",
     webPreferences: {
-      sandbox: true
+      sandbox: true,
+      devTools: debug
     }
   })
+  if (clear) {
+    await win.webContents.session.clearAuthCache();
+    await win.webContents.session.clearCache();
+    await win.webContents.session.clearStorageData();
+  }
 
+  win.webContents.openDevTools();
 
-  win.webContents.loadURL(url).then(() => {
-    win.maximize()
-    win.show()
-  }).catch((err) => {
-    console.error("could not open window", err)
-    app.exit(0)
-  })
+  try {
+    await win.webContents.loadURL(url)
+    win.maximize();
+    win.show();
+  } catch (err) {
+    console.error("could not open window", err);
+    app.exit(0);
+  }
 
 }
 
-const gotTheLock = app.requestSingleInstanceLock()
+const singleInstanceLock = app.requestSingleInstanceLock()
 
-if (!gotTheLock) {
+if (!singleInstanceLock) {
   console.log("app already running")
   app.quit()
 } else {
@@ -40,8 +51,8 @@ if (!gotTheLock) {
       return
     }
 
-    let url = argv[3].split(':', 2);
-    url = `https://${url[1]}`;
+    let urlParts = argv[3].split(':', 2);
+    const url = `https://${urlParts[1]}`;
 
     if (win) {
       console.log("window found")
@@ -54,30 +65,40 @@ if (!gotTheLock) {
 
   })
 
-  if (app.isPackaged) {
-    process.argv.unshift(null)
+  program.version('0.10.1')
+    .arguments('<url>')
+    .option('-d,--debug', 'debug mode', false)
+    .option('-c,--clear', 'clear data', false)
+    .parse();
+
+  const opts = program.opts();
+  const args = program.args;
+
+
+  if (opts.debug) {
+    console.log(JSON.stringify(opts))
+    console.log(JSON.stringify(args))
   }
 
-  if (!process.argv || process.argv.length < 3) {
-    console.error('no info browser', argv)
+
+  let urlParts = args[0].split(':', 2);
+
+  if (urlParts.length != 2) {
+    console.log(`incorrect url format ${args[0]}\n`);
+    setTimeout(() => { app.quit() }, 2000);
+  }
+
+  const url = `https://${urlParts[1]}`;
+
+  app.whenReady().then(() => createWindow(url, opts.debug)).catch((err) => {
+    console.error("app never ready", err)
     app.exit(0)
-  } else {
+  })
+  app.once('window-all-closed', () => {
+    console.log("closing all")
+    app.exit(0)
+  })
 
 
-    let url = process.argv[2].split(':', 2);
-    url = `https://${url[1]}`;
-    app.whenReady().then(() => createWindow(url)).catch((err) => {
-      console.error("app never ready", err)
-      app.exit(0)
-    })
-    app.once('window-all-closed', () => {
-      console.log("closing all")
-      app.exit(0)
-    })
-
-
-  }
 }
 
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.

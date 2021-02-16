@@ -11,8 +11,8 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "electron": "^10.0.0",
-    "electron-builder": "^22.8.0"
+    "electron": "^11.2.3",
+    "electron-builder": "^22.9.1"
   },
   "build": {
     "nsis": {
@@ -29,5 +29,8 @@
         "ipcom"
       ]
     }
+  },
+  "dependencies": {
+    "commander": "^7.1.0"
   }
 }

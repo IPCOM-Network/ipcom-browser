@@ -8,3 +8,9 @@ Este browser se abre en el momento que se llama desde el shell de windows una di
 * instalar haciendo doble click al ejecutable 
 * cuando pregunte es importante decirle que es para todos los usuarios 
 
+## Opciones 
+
+Existen dos opciones posibles: 
+
+* `--debug` : abre el programa con una ventana de devtools
+* `--clear` : borra cookies y datos del programa
