@@ -4,7 +4,7 @@
   "description": "IPCOM Browser",
   "main": "main.js",
   "scripts": {
-    "start": "electron . aaaaa",
+    "start": "electron .",
     "dist": "electron-builder -w nsis --publish never",
     "distweb": "electron-builder -w nsis-web"
   },
@@ -30,5 +30,7 @@
       ]
     }
   },
-  "dependencies": {}
+  "dependencies": {
+    "commander": "^7.1.0"
+  }
 }
