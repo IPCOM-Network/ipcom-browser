@@ -1,7 +1,6 @@
 const { app, BrowserWindow, Menu } = require('electron')
 const { program } = require('commander');
-app.commandLine.appendSwitch('disable-site-isolation-trials');
-app.commandLine.appendSwitch('disable-features', 'OutOfBlinkCors');
+
 
 
 let win;
@@ -10,20 +9,14 @@ let win;
 async function createWindow(url, debug, clear) {
   Menu.setApplicationMenu(null);
   // Create the browser window.
-
   win = new BrowserWindow({
     show: false,
     title: "IPCOM Browser",
     webPreferences: {
-      allowRunningInsecureContent: true,
-      webSecurity: false,
-      sandbox: false,
+      sandbox: true,
       devTools: debug
     }
   })
-
-  win.webContents.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.190 Safari/537.36')
-
   if (clear) {
     await win.webContents.session.clearAuthCache();
     await win.webContents.session.clearCache();
