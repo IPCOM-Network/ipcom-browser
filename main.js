@@ -1,11 +1,8 @@
 const { app, BrowserWindow, Menu } = require('electron')
-const { program } = require('commander');
-app.commandLine.appendSwitch('disable-site-isolation-trials');
-app.commandLine.appendSwitch('disable-features', 'OutOfBlinkCors');
+const { program, parse } = require('commander');
 
 
 let win;
-
 
 async function createWindow(url, debug, clear) {
   Menu.setApplicationMenu(null);
@@ -50,16 +47,8 @@ if (!singleInstanceLock) {
   app.quit()
 } else {
   app.on('second-instance', (event, argv, workingDirectory) => {
-    if (app.isPackaged) {
-      argv.unshift(null)
-    }
-    if (!argv || argv.length < 4) {
-      console.log("wrong number of args", argv)
-      return
-    }
 
-    let urlParts = argv[3].split(':', 2);
-    const url = `https://${urlParts[1]}`;
+    const [url, opts] = getArgs(argv);
 
     if (win) {
       console.log("window found")
@@ -67,35 +56,13 @@ if (!singleInstanceLock) {
       if (win.isMinimized()) win.restore()
       win.focus()
     } else {
-      createWindow(url)
+      createWindow(url, opts.debug)
     }
 
   })
 
-  program.version('0.10.1')
-    .arguments('<url>')
-    .option('-d,--debug', 'debug mode', false)
-    .option('-c,--clear', 'clear data', false)
-    .parse();
 
-  const opts = program.opts();
-  const args = program.args;
-
-
-  if (opts.debug) {
-    console.log(JSON.stringify(opts))
-    console.log(JSON.stringify(args))
-  }
-
-
-  let urlParts = args[0].split(':', 2);
-
-  if (urlParts.length != 2) {
-    console.log(`incorrect url format ${args[0]}\n`);
-    setTimeout(() => { app.quit() }, 2000);
-  }
-
-  const url = `https://${urlParts[1]}`;
+  const [url, opts] = getArgs();
 
   app.whenReady().then(() => createWindow(url, opts.debug)).catch((err) => {
     console.error("app never ready", err)
@@ -109,3 +76,30 @@ if (!singleInstanceLock) {
 
 }
 
+function getArgs(argv) {
+  const p = program.version('0.10.2')
+    .arguments('<url>')
+    .option('-d,--debug', 'debug mode', false)
+    .option('-c,--clear', 'clear data', false)
+    .parse(argv)
+
+
+  const opts = program.opts();
+  const args = program.args;
+
+
+  if (opts.debug) {
+    console.log(JSON.stringify(opts))
+    console.log(JSON.stringify(args))
+  }
+  let urlParts = args[0].split(':', 2);
+
+  if (urlParts.length != 2) {
+    console.log(`incorrect url format ${args[0]}\n`);
+    setTimeout(() => { app.quit() }, 2000);
+  }
+
+  const url = `https://${urlParts[1]}`;
+  return [url, opts];
+
+}
