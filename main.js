@@ -1,6 +1,6 @@
-const { app, BrowserWindow, Menu } = require('electron')
-const { program, parse } = require('commander');
-
+const { app, BrowserWindow, Menu, netLog } = require('electron')
+const { program, } = require('commander');
+const path = require('path');
 
 let win;
 
@@ -46,6 +46,7 @@ if (!singleInstanceLock) {
   console.log("app already running")
   app.quit()
 } else {
+
   app.on('second-instance', (event, argv, workingDirectory) => {
 
     const [url, opts] = getArgs(argv);
@@ -64,12 +65,17 @@ if (!singleInstanceLock) {
 
   const [url, opts] = getArgs();
 
-  app.whenReady().then(() => createWindow(url, opts.debug)).catch((err) => {
+  app.whenReady().then(async () => {
+    const file = path.join(app.getPath('documents'), "netlog.json")
+    await netLog.startLogging(file);
+    return createWindow(url, opts.debug)
+  }).catch((err) => {
     console.error("app never ready", err)
     app.exit(0)
   })
-  app.once('window-all-closed', () => {
+  app.once('window-all-closed', async () => {
     console.log("closing all")
+    await netLog.stopLogging();
     app.exit(0)
   })
 
