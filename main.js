@@ -1,8 +1,10 @@
-const { app, BrowserWindow, Menu, netLog } = require('electron')
+const { app, BrowserWindow, Menu, netLog, BrowserView } = require('electron')
 const { program, } = require('commander');
 const path = require('path');
+const { fstat, unlinkSync } = require('fs');
 
-let win;
+
+let win, view;
 
 async function createWindow(url, debug, clear) {
   Menu.setApplicationMenu(null);
@@ -19,7 +21,12 @@ async function createWindow(url, debug, clear) {
     }
   })
 
+  view = new BrowserView();
+
   win.webContents.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.190 Safari/537.36')
+
+  win.setBrowserView(view);
+  view.setAutoResize({ width: true, height: true })
 
   if (clear) {
     await win.webContents.session.clearAuthCache();
@@ -27,12 +34,15 @@ async function createWindow(url, debug, clear) {
     await win.webContents.session.clearStorageData();
   }
 
-  win.webContents.openDevTools();
+  if (debug) {
+    win.webContents.openDevTools();
+  }
 
   try {
-    await win.webContents.loadURL(url)
+    await view.webContents.loadURL(url);
     win.maximize();
     win.show();
+    view.setBounds(win.getBounds())
   } catch (err) {
     console.error("could not open window", err);
     app.exit(0);
@@ -53,7 +63,7 @@ if (!singleInstanceLock) {
 
     if (win) {
       console.log("window found")
-      win.webContents.loadURL(url)
+      view.webContents.loadURL(url)
       if (win.isMinimized()) win.restore()
       win.focus()
     } else {
@@ -67,7 +77,8 @@ if (!singleInstanceLock) {
 
   app.whenReady().then(async () => {
     const file = path.join(app.getPath('documents'), "netlog.json")
-    await netLog.startLogging(file);
+    unlinkSync(file);
+    await netLog.startLogging(file, { captureMode: 'everything' });
     return createWindow(url, opts.debug)
   }).catch((err) => {
     console.error("app never ready", err)
