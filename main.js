@@ -21,7 +21,33 @@ async function createWindow(url, debug, clear) {
     }
   })
 
-  view = new BrowserView();
+  view = new BrowserView({
+    webPreferences: {
+      webSecurity: false,
+      sandbox: false,
+      devTools: debug,
+    }
+  });
+
+  const filter = {
+    urls: ['*://localhost/*'] // Remote API URS for which you are getting CORS error
+  }
+
+  view.webContents.session.webRequest.onHeadersReceived(
+    filter,
+    (details, callback) => {
+      details.responseHeaders['access-control-allow-origin'] = [
+        '*'  // URL your local electron app hosted
+      ]
+      details.responseHeaders['access-control-allow-methods'] = [
+        '*'  // URL your local electron app hosted
+      ]
+      details.responseHeaders['access-control-allow-headers'] = [
+        '*'  // URL your local electron app hosted
+      ]
+      callback({ responseHeaders: details.responseHeaders })
+    }
+  )
 
   win.webContents.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.190 Safari/537.36')
 
@@ -35,7 +61,7 @@ async function createWindow(url, debug, clear) {
   }
 
   if (debug) {
-    win.webContents.openDevTools();
+    view.webContents.openDevTools();
   }
 
   try {
@@ -56,7 +82,8 @@ if (!singleInstanceLock) {
   console.log("app already running")
   app.quit()
 } else {
-
+  app.commandLine.appendSwitch('disable-site-isolation-trials');
+  app.commandLine.appendSwitch("disable-features", "OutOfBlinkCors");
   app.on('second-instance', (event, argv, workingDirectory) => {
 
     const [url, opts] = getArgs(argv);
