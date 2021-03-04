@@ -54,15 +54,17 @@ if (!singleInstanceLock) {
     let urlParts = argv[3].split(':', 2);
     const url = `https://${urlParts[1]}`;
 
-    if (win) {
-      console.log("window found")
-      win.webContents.loadURL(url)
-      if (win.isMinimized()) win.restore()
-      win.focus()
-    } else {
-      createWindow(url)
-    }
-
+    setTimeout(
+      function () {
+        if (win) {
+          console.log("window found")
+          win.webContents.loadURL(url)
+          if (win.isMinimized()) win.restore()
+          win.focus()
+        } else {
+          createWindow(url)
+        }
+      }, 5000)
   })
 
   program.version('0.10.1')
