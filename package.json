@@ -20,6 +20,7 @@
       "runAfterFinish": false,
       "createDesktopShortcut": false,
       "createStartMenuShortcut": false,
+      "allowToChangeInstallationDirectory":true,
       "include": "build/installer.nsh",
       "artifactName": "${productName}-setup.${ext}"
     },
