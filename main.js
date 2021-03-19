@@ -14,7 +14,8 @@ async function createWindow(url, debug, clear) {
     title: "IPCOM Browser",
     webPreferences: {
       sandbox: true,
-      devTools: debug
+      devTools: true,
+      partition: 'persist:ipcom'
     }
   })
   if (clear) {
