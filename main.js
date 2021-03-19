@@ -14,7 +14,7 @@ async function createWindow(url, debug, clear) {
     title: "IPCOM Browser",
     webPreferences: {
       sandbox: true,
-      devTools: true,
+      devTools: debug,
       partition: 'persist:ipcom'
     }
   })
@@ -24,8 +24,10 @@ async function createWindow(url, debug, clear) {
     await win.webContents.session.clearStorageData();
   }
 
-  win.webContents.openDevTools();
-
+  if(debug) {
+    win.webContents.openDevTools();
+  }
+  
   try {
     await win.webContents.loadURL(url)
     win.maximize();
