@@ -1,7 +1,11 @@
 const { app, BrowserWindow, Menu } = require('electron')
 const { program } = require('commander');
+const os = require('os');
+const crypto = require('crypto')
+const hostname = os.hostname();
+const hosthash = crypto.createHash('sha256').update(hostname).digest('hex').slice(0,10);
 
-
+//console.log('hostname '+hosthash);
 
 let win;
 
@@ -15,7 +19,7 @@ async function createWindow(url, debug, clear) {
     webPreferences: {
       sandbox: true,
       devTools: debug,
-      partition: 'persist:ipcom'
+      partition: `persist:ipcom-${hosthash}`
     }
   })
   if (clear) {

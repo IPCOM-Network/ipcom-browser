@@ -1,6 +1,6 @@
 {
   "name": "ipcom-browser",
-  "version": "0.10.1",
+  "version": "0.10.5",
   "description": "IPCOM Browser",
   "main": "main.js",
   "scripts": {
@@ -11,8 +11,8 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "electron": "^11.2.3",
-    "electron-builder": "^22.9.1"
+    "electron": "^12.0.1",
+    "electron-builder": "^22.10.5"
   },
   "build": {
     "nsis": {
@@ -20,7 +20,7 @@
       "runAfterFinish": false,
       "createDesktopShortcut": false,
       "createStartMenuShortcut": false,
-      "allowToChangeInstallationDirectory":true,
+      "allowToChangeInstallationDirectory": true,
       "include": "build/installer.nsh",
       "artifactName": "${productName}-setup.${ext}"
     },
@@ -32,6 +32,6 @@
     }
   },
   "dependencies": {
-    "commander": "^7.1.0"
+    "commander": "^7.2.0"
   }
 }
